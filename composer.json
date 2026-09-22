@@ -1,0 +1,26 @@
+{
+    "name": "nilmarsm86/phpmd-symfony-preset",
+    "description": "Rulesets de PHPMD por nivel + herramienta de navegación para PHPStorm, con instalación automática en proyectos Symfony.",
+    "type": "composer-plugin",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "composer-plugin-api": "^2.0",
+        "phpmd/phpmd": "2.*"
+    },
+    "require-dev": {
+        "composer/composer": "^2.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nilmarsm86\\PhpmdPreset\\": "src/"
+        }
+    },
+    "extra": {
+        "class": "Nilmarsm86\\PhpmdPreset\\Plugin"
+    },
+    "bin": [
+        "resources/phpmd-pretty"
+    ],
+    "minimum-stability": "stable"
+}
