@@ -2,7 +2,17 @@
     "name": "nilmarsm86/phpmd-symfony-preset",
     "description": "Rulesets de PHPMD por nivel + herramienta de navegación para PHPStorm, con instalación automática en proyectos Symfony.",
     "type": "composer-plugin",
-    "license": "proprietary",
+    "license": "MIT",
+	"keywords": ["phpmd"],
+	"homepage": "https://github.com/nilmarsm86/phpmd-symfony-preset",
+	 "authors": [
+        {
+            "name": "Nilmar Sanchez Muguercia",
+            "email": "nilmarsm86@gmail.com",
+            "homepage": "https://www.linkedin.com/in/nilmarsm86/",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=8.1",
         "composer-plugin-api": "^2.0",
