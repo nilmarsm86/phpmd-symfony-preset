@@ -73,7 +73,7 @@ final class Installer
 
         $defaults = [
             "phpmd" => "php vendor/bin/phpmd-pretty",
-            "phpmd:next" => "php vendor/bin/phpmd-pretty",
+            "phpmd:next" => "php vendor/bin/phpmd-pretty next",
             "phpmd:0" => "php vendor/bin/phpmd-pretty 0",
             "phpmd:1" => "php vendor/bin/phpmd-pretty 1",
             "phpmd:2" => "php vendor/bin/phpmd-pretty 2",
@@ -99,6 +99,6 @@ final class Installer
             $composerJsonPath,
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n"
         );
-        $io->write('<info>[phpmd-preset]</info> Scripts "composer phpmd:1|2|3|4|5|6|next" añadidos a composer.json');
+        $io->write('<info>[phpmd-preset]</info> Scripts "composer phpmd|phpmd:0|1|2|3|4|5|6|next" añadidos a composer.json');
     }
 }
