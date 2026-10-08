@@ -3,7 +3,7 @@
     "description": "Rulesets de PHPMD por nivel + herramienta de navegación para PHPStorm, con instalación automática en proyectos Symfony.",
     "type": "composer-plugin",
     "license": "MIT",
-	"keywords": ["phpmd"],
+	"keywords": ["dev", "phpmd"],
 	"homepage": "https://github.com/nilmarsm86/phpmd-symfony-preset",
 	"authors": [
         {
