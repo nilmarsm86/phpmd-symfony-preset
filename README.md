@@ -48,3 +48,12 @@ composer phpmd:next # pasa al siguiente nivel
 
 PHPStorm detecta automáticamente como enlaces en la consola (igual que con
 phpstan/psalm) — no hace falta configurar ninguna "External Tool" aparte.
+
+## 4. Actualizar a la versión 2
+Al subir de 1.x a 2.x, borra phpmd/level*.xml y ejecuta:
+
+```bash
+composer update 
+```
+
+para recibir los nuevos archivos de configuración de reglas.

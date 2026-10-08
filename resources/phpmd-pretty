@@ -147,10 +147,11 @@ function formatLevelSummary(array $counts): string
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-$isWindows = 'WIN' === strtoupper(substr(PHP_OS, 0, 3));
+														
 $xmlFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'phpmd_output.xml';
 $phpmd = $projectRoot.'/vendor/bin/phpmd';
-$redirect = $isWindows ? '2>NUL' : '2>/dev/null';
+// stderr se mezcla con stdout (en cmd.exe y en sh) para poder mostrarlo si phpmd falla.
+$redirect = '2>&1';
 
 // Leer modo/nivel desde argumento:
 //   php bin/phpmd-pretty        -> nivel guardado, solo reporta
@@ -159,7 +160,7 @@ $redirect = $isWindows ? '2>NUL' : '2>/dev/null';
 $arg1 = $argv[1] ?? null;
 $autoAdvance = 'next' === $arg1;
 $level = (null !== $arg1 && is_numeric($arg1)) ? (int) $arg1 : null;
-		   
+	 
 
 // Leer nivel guardado si no se pasó un número explícito
 $levelFile = $projectRoot.'/phpmd/.level';
@@ -181,16 +182,34 @@ if (!file_exists($config)) {
 echo "\n\033[90mNivel activo: \033[1m{$level}/{$maxLevel}\033[0m";
 echo " \033[90m→ phpmd/level{$level}.xml\033[0m\n";
 
+// PHPMD 3: formato y ruleset dejaron de ser posicionales y --reportfile fue
+// eliminado; el XML se pide con --reportfile-xml. --no-progress evita la barra
+// de progreso en stderr.
 $command = sprintf(
-    'php %s %s xml %s --reportfile %s %s',
+    'php %s analyze --ruleset %s --reportfile-xml %s --no-progress %s %s',
     escapeshellarg($phpmd),
-    'src/',
+		   
     escapeshellarg($config),
     escapeshellarg($xmlFile),
+    'src/',
     $redirect
 );
 
+// Evita leer un reporte viejo si una ejecución anterior murió a medias.
+if (file_exists($xmlFile)) {
+    unlink($xmlFile);
+}
+
 exec($command, $output, $exitCode);
+
+// PHPMD: 0 = limpio, 2 = hay violaciones. Cualquier otro código es un fallo de
+// ejecución (en PHPMD 3, 3 = archivos que no se pudieron procesar) y NUNCA debe
+// interpretarse como "limpio": con "next" eso subiría de nivel por error.
+if (!in_array($exitCode, [0, 2], true) || (2 === $exitCode && !file_exists($xmlFile))) {
+    echo "\033[31m❌ PHPMD no pudo completar el análisis (código de salida {$exitCode}).\033[0m\n";
+    echo implode("\n", array_slice($output, -30))."\n";
+    exit(1);
+}
 
 // Se acumulan aquí para que el resumen y la lógica de "siguiente nivel" se
 // evalúen siempre en un único punto, aunque phpmd no haya generado reporte
@@ -211,7 +230,7 @@ if (file_exists($xmlFile)) {
     if ($xml && isset($xml->file)) {
         $cwd = getcwd().DIRECTORY_SEPARATOR;
 
-								  
+		  
         echo "\033[1m\033[33m⚠  PHPMD — Nivel {$level}/{$maxLevel}\033[0m\n";
         echo str_repeat('─', 60)."\n";
  
@@ -219,7 +238,7 @@ if (file_exists($xmlFile)) {
         foreach ($xml->file as $file) {
             $absolutePath = (string) $file['name'];
             $relativePath = str_replace('\\', '/', str_replace($cwd, '', $absolutePath));
-									
+		 
 
             // ✅ Saltar archivos excluidos
             if (isExcluded($absolutePath, $excludePatterns)) {
@@ -232,9 +251,9 @@ if (file_exists($xmlFile)) {
             ++$fileCount;
 
             echo "\n".formatFileHeader($absolutePath, $relativePath, $count)."\n";
-													  
-				 
+			   
 	 
+  
 
             foreach ($violations as $violation) {
                 $rule = (string) $violation['rule'];
@@ -248,11 +267,11 @@ if (file_exists($xmlFile)) {
 
                 $meta = priorityMeta($priority);
                 $link = fileLink($absolutePath, $beginLine, $endLine);
-												  
-												   
-											   
-												 
-											 
+			  
+			   
+			  
+			 
+			
 
                 echo "  {$meta['icon']} {$meta['color']}{$meta['label']}\033[0m";
                 echo "  \033[1m{$rule}\033[0m \033[90m[{$ruleset}]\033[0m\n";
@@ -265,16 +284,16 @@ if (file_exists($xmlFile)) {
         echo "\033[1m📊 Total: {$totalViolations} violaciones en {$fileCount} archivo(s)\033[0m\n";
 
         if ('' !== ($summary = formatLevelSummary($countsByPriority))) {
-																	 
+				  
             echo $summary."\n";
         }
     }
 }
 
-													
+			 
 
-									 
-																							 
+		  
+						
 
 if (0 === $totalViolations) {
     echo "\n\033[32m✅ Sin violaciones en nivel {$level}\033[0m\n";
